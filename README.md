@@ -8,13 +8,15 @@ Why Separate Blob Storage from MongoDB?
 Before we jump into code, let's understand why this matters. While MongoDB is fantastic for document storage, it has some limitations when dealing with large binary objects:
 MongoDB has a document size limit of 16MB, which can be restrictive for storing large files like PDFs, videos, or high-res images.
 
-The primary advantages of using external storage like S3 include:
-Cost efficiency - S3 storage is significantly cheaper per GB than MongoDB storage
-Scalability - S3 can handle virtually unlimited storage needs
-Performance - Offloading large binary data prevents MongoDB from becoming bloated
-CDN integration - S3 works seamlessly with content delivery networks for faster global access
+The primary advantages of using external storage like S3 include:  
 
-Approach 1: Simple S3 References in MongoDB
+1. Cost efficiency - S3 storage is significantly cheaper per GB  
+2. Scalability - S3 can handle virtually unlimited storage needs  
+3. Performance - Offloading large binary data prevents MongoDB from becoming bloated  
+4. CDN integration - S3 works seamlessly with content delivery networks for faster global access  
+
+## Approach 1:  
+Simple S3 References in MongoDB
 The most straightforward approach is to store references to S3 objects in your MongoDB documents. This is ideal when you need basic blob storage with minimal integration. For additional data governance, I recommend hashing to ensure object immutability.
 Here's how we implement it in Python in **`insert_file.py`**
 
