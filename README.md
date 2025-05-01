@@ -16,7 +16,7 @@ CDN integration - S3 works seamlessly with content delivery networks for faster 
 
 Approach 1: Simple S3 References in MongoDB
 The most straightforward approach is to store references to S3 objects in your MongoDB documents. This is ideal when you need basic blob storage with minimal integration. For additional data governance, I recommend hashing to ensure object immutability.
-Here's how we implement it in Python in insert_file.py
+Here's how we implement it in Python in **`insert_file.py`**
 
 The sample document would look something like this. Take note and look at the file array structure of references. 
 ```
