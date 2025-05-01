@@ -1,7 +1,9 @@
 # Atlas Application Federation
 Implement federation application-side with MongoDB Atlas and S3
 
-Hey there, fellow devs! Today, I'm diving into a powerful MongoDB pattern that's been a game-changer for my data-heavy applications. I'll show you how to reference external storage (specifically AWS S3) from MongoDB documents and implement application federation to retrieve both MongoDB and S3 data in a unified payload.
+Hey there, fellow devs! 
+
+Today, I'm diving into a powerful MongoDB pattern that's been a game-changer for my data-heavy applications. I'll show you how to reference external storage (specifically AWS S3) from MongoDB documents and implement application federation to retrieve both MongoDB and S3 data in a unified payload.
 Why Separate Blob Storage from MongoDB?
 Before we jump into code, let's understand why this matters. While MongoDB is fantastic for document storage, it has some limitations when dealing with large binary objects:
 MongoDB has a document size limit of 16MB, which can be restrictive for storing large files like PDFs, videos, or high-res images.
