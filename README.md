@@ -1,5 +1,4 @@
 # Atlas Application Federation
-Implement federation application-side with MongoDB Atlas and S3
 
 Hey there, fellow devs! 
 
