@@ -14,8 +14,7 @@ The primary advantages of using external storage like S3 include:
 3. Performance - Offloading large binary data prevents MongoDB from becoming bloated  
 4. CDN integration - S3 works seamlessly with content delivery networks for faster global access  
 
-## Approach 1:  
-Simple S3 References in MongoDB
+## Approach 1:  Simple S3 References in MongoDB
 The most straightforward approach is to store references to S3 objects in your MongoDB documents. This is ideal when you need basic blob storage with minimal integration. For additional data governance, I recommend hashing to ensure object immutability.
 Here's how we implement it in Python in **`insert_file.py`**
 
@@ -33,3 +32,7 @@ The sample document would look something like this. Take note and look at the fi
   }
 }
 ``` 
+---
+## Approach 2:  Application Federation for Unified Data Access
+What if we need to retrieve both MongoDB data and associated S3 objects in a single operation? This is where application federation comes in, allowing us to abstract away the storage details from the client.
+Here's how we implement it in Python's FLASK API . Code in **`federate_file.py`**
