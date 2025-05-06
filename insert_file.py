@@ -25,8 +25,6 @@ try:
 except Exception as e:
     print(e)
 
-print(aws_secret_key)
-print(aws_access_key)
 # S3 connection
 s3_client = boto3.client(
     's3',
