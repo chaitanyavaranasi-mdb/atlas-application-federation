@@ -2,17 +2,36 @@ import pymongo
 import boto3
 import uuid
 from botocore.exceptions import NoCredentialsError
+from dotenv import load_dotenv
+import os
+
+#load env and mark variables
+load_dotenv()
+mongo_uri = os.getenv("MONGODB_URI")
+database_name = os.getenv("MONGODB_DATABASE")
+collection_name = os.getenv("MONGODB_COLLECTION")
+aws_access_key = os.getenv("AWS_ACCESS_KEY")
+aws_secret_key = os.getenv("AWS_SECRET_KEY")
+aws_bucket_name = os.getenv("AWS_BUCKET_NAME")
 
 # MongoDB connection - https://www.mongodb.com/docs/atlas/driver-connection/
-mongo_client = pymongo.MongoClient("mongodb://username:password@hostname:port/")
-db = mongo_client["your_database"]
-collection = db["your_collection"]
+mongo_client = pymongo.MongoClient(mongo_uri)
+db = mongo_client[database_name]
+collection = db[collection_name]
 
+try:
+    mongo_client.admin.command('ping')
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+except Exception as e:
+    print(e)
+
+print(aws_secret_key)
+print(aws_access_key)
 # S3 connection
 s3_client = boto3.client(
     's3',
-    aws_access_key_id='YOUR_ACCESS_KEY',
-    aws_secret_access_key='YOUR_SECRET_KEY'
+    aws_access_key_id = aws_access_key,
+    aws_secret_access_key = aws_secret_key
 )
 
 def upload_file_to_s3(file_path, bucket_name, object_name=None):
@@ -57,3 +76,5 @@ def store_document_with_s3_reference(document_data, file_path, bucket_name):
         return result.inserted_id
     
     return None
+
+store_document_with_s3_reference({}, "sample-pictures/cat.jpg", aws_bucket_name)
