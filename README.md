@@ -255,7 +255,3 @@ Configuration is managed through environment variables (via `.env` file):
 - [MongoDB Atlas Documentation](https://www.mongodb.com/docs/atlas/)
 - [AWS S3 Documentation](https://docs.aws.amazon.com/s3/index.html)
 - [Flask Documentation](https://flask.palletsprojects.com/)
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
