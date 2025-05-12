@@ -1,38 +1,261 @@
 # Atlas Application Federation
 
-Hey there, fellow devs! 
+A robust solution for integrating MongoDB with external storage services (AWS S3) to overcome document size limitations and optimize storage costs.
 
-Today, I'm diving into a powerful MongoDB pattern that's been a game-changer for my data-heavy applications. I'll show you how to reference external storage (specifically AWS S3) from MongoDB documents and implement application federation to retrieve both MongoDB and S3 data in a unified payload.
-Why Separate Blob Storage from MongoDB?
-Before we jump into code, let's understand why this matters. While MongoDB is fantastic for document storage, it has some limitations when dealing with large binary objects:
-MongoDB has a document size limit of 16MB, which can be restrictive for storing large files like PDFs, videos, or high-res images.
+## 📋 Overview
 
-The primary advantages of using external storage like S3 include:  
+This project demonstrates a powerful pattern for handling large files in MongoDB applications by:
 
-1. Cost efficiency - S3 storage is significantly cheaper per GB  
-2. Scalability - S3 can handle virtually unlimited storage needs  
-3. Performance - Offloading large binary data prevents MongoDB from becoming bloated  
-4. CDN integration - S3 works seamlessly with content delivery networks for faster global access  
+1. Storing large binary files in AWS S3
+2. Maintaining references to these files in MongoDB documents
+3. Implementing application federation to provide a unified data access layer
 
-## Use Case 1:  Simple S3 References in MongoDB
-The most straightforward approach is to store references to S3 objects in your MongoDB documents. This is ideal when you need basic blob storage with minimal integration. For additional data governance, I recommend hashing to ensure object immutability.
-Here's how we implement it in Python in **`insert_file.py`**
+## 🔑 Key Benefits
 
-The sample document would look something like this. Take note and look at the file array structure of references. 
+- **Overcome MongoDB's 16MB document size limit** for large binary objects
+- **Reduce storage costs** by leveraging S3's cost-effective storage tiers
+- **Improve database performance** by keeping MongoDB collections lean
+- **Scale independently** for document data and binary assets
+- **Simplify client applications** through a unified API that abstracts storage details
+
+## 🏗️ Architecture
+
+The solution consists of two main components:
+
+1. **S3 Storage Integration** (`insert_file.py`): Uploads files to S3 and stores references in MongoDB
+2. **Application Federation API** (`federate_file.py`): A Flask API that unifies access to both MongoDB data and S3 files
+
+### How it Works
+
 ```
+┌─────────────┐         ┌─────────────┐         ┌─────────────┐
+│             │         │             │         │             │
+│   Client    │ ───────►│  Flask API  │ ───────►│  MongoDB    │
+│  Application│         │(Federation) │         │             │
+│             │         │             │         └──────┬──────┘
+└─────────────┘         └─────────────┘                │
+                               │                        │
+                               │                        │
+                               ▼                        │
+                        ┌─────────────┐                 │
+                        │             │                 │
+                        │   AWS S3    │◄────────────────┘
+                        │             │    Reference
+                        └─────────────┘
+```
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Python 3.7+
+- MongoDB Atlas account (or local MongoDB instance)
+- AWS account with S3 access
+
+### Installation
+
+1. Clone the repository
+```bash
+git clone https://github.com/yourusername/atlas-application-federation.git
+cd atlas-application-federation
+```
+
+2. Install dependencies
+```bash
+pip install -r requirements.txt
+```
+
+3. Create a `.env` file in the project root
+```
+MONGODB_URI=your_mongodb_connection_string
+MONGODB_DATABASE=your_database_name
+MONGODB_COLLECTION=your_collection_name
+AWS_ACCESS_KEY=your_aws_access_key
+AWS_SECRET_KEY=your_aws_secret_key
+AWS_BUCKET_NAME=your_s3_bucket_name
+LOG_LEVEL=INFO
+```
+
+## 🔧 Usage
+
+### 1. Uploading Files to S3 and Storing References in MongoDB
+
+Run the `insert_file.py` script to upload a file to S3 and store its reference in MongoDB:
+
+```bash
+python insert_file.py
+```
+
+This script:
+- Uploads the file to S3
+- Generates a unique ID for the file
+- Makes the file publicly accessible (optional)
+- Creates a MongoDB document with a reference to the S3 file
+
+Example document structure:
+```json
 {
   "_id": ObjectId("60a2c3e4c5fd4b001a123456"),
-  "title": "Important Report",
-  "author": "Jane Doe",
+  "title": "Cat Picture",
+  "description": "A sample cat image",
   "created_at": ISODate("2025-05-01T10:30:45.123Z"),
   "file_reference": {
     "bucket": "my-company-docs",
-    "key": "8a7b6c5d-4e3f-2a1b-0c9d-8e7f6a5b4c3d_report.pdf",
-    "url": "https://my-company-docs.s3.us-east-1.amazonaws.com/8a7b6c5d-4e3f-2a1b-0c9d-8e7f6a5b4c3d_report.pdf"
+    "key": "8a7b6c5d-4e3f-2a1b-0c9d-8e7f6a5b4c3d_cat.jpg",
+    "url": "https://my-company-docs.s3.us-east-1.amazonaws.com/8a7b6c5d-4e3f-2a1b-0c9d-8e7f6a5b4c3d_cat.jpg"
   }
 }
-``` 
----
-## Use Case 2:  Application Federation for Unified Data Access
-What if we need to retrieve both MongoDB data and associated S3 objects in a single operation? This is where application federation comes in, allowing us to abstract away the storage details from the client.
-Here's how we implement it in Python's FLASK API . Code in **`federate_file.py`**
+```
+
+### 2. Running the Federation API
+
+Start the Flask API to provide unified access to MongoDB documents and S3 files:
+
+```bash
+python federate_file.py
+```
+
+The API will be available at `http://localhost:5000`
+
+## 🌐 API Endpoints
+
+### Get a Document with its File
+```
+GET /api/documents/{document_id}
+```
+Returns a document from MongoDB with its S3 file embedded as base64.
+
+Example response:
+```json
+{
+  "_id": "60a2c3e4c5fd4b001a123456",
+  "title": "Cat Picture",
+  "description": "A sample cat image",
+  "created_at": "2025-05-01T10:30:45.123Z",
+  "file_reference": {
+    "bucket": "my-company-docs",
+    "key": "8a7b6c5d-4e3f-2a1b-0c9d-8e7f6a5b4c3d_cat.jpg",
+    "url": "https://my-company-docs.s3.us-east-1.amazonaws.com/8a7b6c5d-4e3f-2a1b-0c9d-8e7f6a5b4c3d_cat.jpg"
+  },
+  "file_data": {
+    "content": "base64_encoded_content_here",
+    "content_type": "image/jpeg",
+    "size": 1048576,
+    "last_modified": "2025-05-01T10:35:22.123Z"
+  }
+}
+```
+
+### Get All Documents
+```
+GET /api/documents
+```
+Returns all documents from MongoDB (without S3 files).
+
+### Get Document File Only
+```
+GET /api/documents/{document_id}/file
+```
+Returns only the file associated with a document.
+
+Example response:
+```json
+{
+  "content": "base64_encoded_content_here",
+  "content_type": "image/jpeg",
+  "size": 1048576,
+  "last_modified": "2025-05-01T10:35:22.123Z"
+}
+```
+
+### Health Check
+```
+GET /health
+```
+Returns the health status of MongoDB and S3 connections.
+
+Example response:
+```json
+{
+  "status": "healthy",
+  "mongodb": "Connected",
+  "s3": "Connected"
+}
+```
+
+## 📝 Implementation Details
+
+### S3 Integration (`insert_file.py`)
+
+The `insert_file.py` script handles:
+- Connecting to MongoDB and S3
+- Uploading files to S3 with unique names
+- Setting appropriate S3 permissions
+- Creating MongoDB documents with S3 references
+- Comprehensive logging
+
+### Federation API (`federate_file.py`)
+
+The `federate_file.py` implements:
+- RESTful API endpoints with Flask
+- Document retrieval from MongoDB
+- File downloading from S3
+- Base64 encoding for JSON embedding
+- Error handling and status codes
+- Comprehensive logging
+
+## 🔍 Logging
+
+Both components use a consistent logging approach:
+
+- Configurable log level via the `LOG_LEVEL` environment variable
+- Structured log format with timestamps and log levels
+- Context-specific log messages for all operations
+- Proper error handling with detailed error logging
+
+Example log output:
+```
+[2025-05-09 10:15:22] [atlas_federation] [INFO] Starting Atlas Application Federation API server
+[2025-05-09 10:15:30] [atlas_federation] [INFO] Retrieving document with ID: 60a2c3e4c5fd4b001a123456
+[2025-05-09 10:15:30] [atlas_federation] [DEBUG] Downloading file from S3: my-company-docs/8a7b6c5d-4e3f-2a1b-0c9d-8e7f6a5b4c3d_cat.jpg
+[2025-05-09 10:15:31] [atlas_federation] [INFO] Successfully retrieved document and file: 60a2c3e4c5fd4b001a123456
+```
+
+## 🔧 Configuration
+
+Configuration is managed through environment variables (via `.env` file):
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `MONGODB_URI` | MongoDB connection string | `mongodb+srv://user:password@cluster.mongodb.net/` |
+| `MONGODB_DATABASE` | MongoDB database name | `myapp` |
+| `MONGODB_COLLECTION` | MongoDB collection name | `documents` |
+| `AWS_ACCESS_KEY` | AWS access key ID | `AKIAIOSFODNN7EXAMPLE` |
+| `AWS_SECRET_KEY` | AWS secret access key | `wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY` |
+| `AWS_BUCKET_NAME` | S3 bucket name | `my-company-docs` |
+| `LOG_LEVEL` | Logging level | `INFO` |
+
+## 🧩 Extension Ideas
+
+- **Add authentication** to the API endpoints
+- **Implement caching** for frequently accessed files
+- **Support additional storage backends** beyond S3 (GCS, Azure Blob Storage)
+- **Add file processing capabilities** (thumbnails, transcoding, etc.)
+- **Implement file versioning** for document management use cases
+
+## 🔒 Security Considerations
+
+- **Authentication**: Implement a proper authentication mechanism for API access
+- **S3 Security**: Use private S3 buckets and signed URLs for sensitive content
+- **Data Validation**: Validate all inputs, particularly document IDs and file paths
+- **Rate Limiting**: Implement rate limiting to prevent abuse
+
+## 📚 Additional Resources
+
+- [MongoDB Atlas Documentation](https://www.mongodb.com/docs/atlas/)
+- [AWS S3 Documentation](https://docs.aws.amazon.com/s3/index.html)
+- [Flask Documentation](https://flask.palletsprojects.com/)
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
