@@ -242,7 +242,8 @@ Configuration is managed through environment variables (via `.env` file):
 - **Support additional storage backends** beyond S3 (GCS, Azure Blob Storage)
 - **Add file processing capabilities** (thumbnails, transcoding, etc.)
 - **Implement file versioning** for document management use cases
-
+- **Incorporate Resume Tokens** for managing long running archival jobs
+  
 ## 🔒 Security Considerations
 
 - **Authentication**: Implement a proper authentication mechanism for API access
@@ -250,8 +251,15 @@ Configuration is managed through environment variables (via `.env` file):
 - **Data Validation**: Validate all inputs, particularly document IDs and file paths
 - **Rate Limiting**: Implement rate limiting to prevent abuse
 
+## ⛙ MongoDB Atlas Data Federation
+
+Atlas Data Federation is a powerful query engine provided by MongoDB that allows users to query, transform, and move data seamlessly across different sources, such as Atlas clusters, cloud storage services (e.g., AWS S3, Azure Blob Storage, Google Cloud Storage), and HTTP endpoints, without requiring complex integrations or data movement. It creates "federated database instances" that map virtual collections to underlying data sources, enabling developers to access data as if it were stored in the same place and format. This solution is ideal for use cases like data engineering, archival, operational analytics, and reshaping data, offering features like provenance metadata, flexible read preferences, and aggregation pipelines to enrich datasets. To get started with Atlas Data Federation, create a federated database instance through the Atlas UI or API, link data stores such as your Atlas cluster or cloud storage buckets, and use the MongoDB Query Language or Atlas SQL to query and transform your data. For step-by-step guidance, visit the MongoDB documentation and explore tutorials to leverage its full capabilities.
+
 ## 📚 Additional Resources
 
 - [MongoDB Atlas Documentation](https://www.mongodb.com/docs/atlas/)
 - [AWS S3 Documentation](https://docs.aws.amazon.com/s3/index.html)
 - [Flask Documentation](https://flask.palletsprojects.com/)
+- [Atlas Data Federation - Learning Byte - Learn](https://learn.mongodb.com/learn/course/atlas-data-federation/learning-byte/learn)
+- [Atlas Data Federation Overview](https://mongodb.com/docs/atlas/data-federation/overview/)
+- [Querying the MongoDB Atlas Price Book with Atlas Data Federation](https://www.mongodb.com/developer/products/atlas/querying-price-book-data-federation)
